@@ -52,6 +52,13 @@ struct AppCommands: Commands {
                 editorVM?.createDocument()
             }
             .keyboardShortcut("n", modifiers: .command)
+
+            Divider()
+
+            Button("Import Script…") {
+                editorVM?.showImportPanel = true
+            }
+            .keyboardShortcut("o", modifiers: [.command, .shift])
         }
 
         // MARK: Session menu

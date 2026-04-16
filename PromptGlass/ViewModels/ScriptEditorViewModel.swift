@@ -33,6 +33,10 @@ final class ScriptEditorViewModel {
     /// Non-nil when the last save attempt failed.
     private(set) var saveError: Error?
 
+    /// Set to `true` to trigger the import-from-file panel in the owning view.
+    /// The view resets this to `false` after handling it.
+    var showImportPanel: Bool = false
+
     /// User-readable description of `saveError`; `nil` when there is no error.
     ///
     /// `Error` is not `Equatable`, so views should observe this `String?` property
@@ -93,6 +97,18 @@ final class ScriptEditorViewModel {
     @discardableResult
     func createDocument(name: String = "Untitled") -> ScriptDocument {
         var doc = ScriptDocument(name: name)
+        ScriptParser.parse(&doc)
+        documents.insert(doc, at: 0)
+        selectedDocument = doc
+        isDirty = false
+        trySave()
+        return doc
+    }
+
+    /// Creates a new script pre-populated with `text`, selects it, and persists.
+    @discardableResult
+    func importDocument(name: String, text: String) -> ScriptDocument {
+        var doc = ScriptDocument(name: name, rawText: text)
         ScriptParser.parse(&doc)
         documents.insert(doc, at: 0)
         selectedDocument = doc

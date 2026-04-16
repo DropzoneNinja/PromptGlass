@@ -1,4 +1,6 @@
+import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Root view for the main editor window.
 ///
@@ -30,6 +32,8 @@ struct MainEditorView: View {
     @State private var documentToRename:   ScriptDocument?
     @State private var documentToDelete:   ScriptDocument?
     @State private var renameText = ""
+    @State private var showFileError      = false
+    @State private var fileErrorMessage   = ""
 
     // MARK: - Body
 
@@ -96,6 +100,19 @@ struct MainEditorView: View {
         .onChange(of: editorVM.saveErrorMessage) { _, message in
             if message != nil { showSaveErrorAlert = true }
         }
+        // File import/export error alert
+        .alert("File Error", isPresented: $showFileError) {
+            Button("OK") { }
+        } message: {
+            Text(fileErrorMessage)
+        }
+        // Triggered by the File menu "Import Script…" command via AppCommands.
+        .onChange(of: editorVM.showImportPanel) { _, show in
+            if show {
+                editorVM.showImportPanel = false
+                importFromFile()
+            }
+        }
     }
 
     // MARK: - Permission banners
@@ -136,8 +153,11 @@ struct MainEditorView: View {
             ForEach(editorVM.documents) { doc in
                 scriptRow(doc)
                     .tag(doc.id)
+                    .onLongPressGesture(minimumDuration: 0.5) { beginRename(doc) }
                     .contextMenu {
                         Button("Rename…") { beginRename(doc) }
+                        Divider()
+                        Button("Save as Text File…") { exportAsText(doc) }
                         Divider()
                         Button("Delete", role: .destructive) { beginDelete(doc) }
                     }
@@ -146,10 +166,13 @@ struct MainEditorView: View {
         .navigationTitle("Scripts")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button(action: { editorVM.createDocument() }) {
+                Menu {
+                    Button("New Script") { editorVM.createDocument() }
+                    Button("Import from File…") { importFromFile() }
+                } label: {
                     Label("New Script", systemImage: "plus")
                 }
-                .help("New Script")
+                .help("New Script or Import")
             }
         }
     }
@@ -240,6 +263,15 @@ struct MainEditorView: View {
                 .help("Delete this script")
             }
         }
+        // Export as text file — only when a script is selected and no session is running.
+        if let doc = editorVM.selectedDocument, !sessionVM.isActive {
+            ToolbarItem {
+                Button(action: { exportAsText(doc) }) {
+                    Label("Save as Text File", systemImage: "square.and.arrow.up")
+                }
+                .help("Save script as a .txt file")
+            }
+        }
         // Save — only when there are unsaved changes.
         if editorVM.isDirty {
             ToolbarItem(placement: .primaryAction) {
@@ -276,6 +308,38 @@ struct MainEditorView: View {
     private func beginDelete(_ doc: ScriptDocument) {
         documentToDelete = doc
         showDeleteDialog = true
+    }
+
+    private func exportAsText(_ doc: ScriptDocument) {
+        let panel = NSSavePanel()
+        panel.title = "Save Script as Text File"
+        panel.nameFieldStringValue = doc.name + ".txt"
+        panel.allowedContentTypes = [.plainText]
+        panel.canCreateDirectories = true
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            try doc.rawText.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            fileErrorMessage = error.localizedDescription
+            showFileError = true
+        }
+    }
+
+    func importFromFile() {
+        let panel = NSOpenPanel()
+        panel.title = "Import Script from Text File"
+        panel.allowedContentTypes = [.plainText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            let text = try String(contentsOf: url, encoding: .utf8)
+            let name = url.deletingPathExtension().lastPathComponent
+            editorVM.importDocument(name: name, text: text)
+        } catch {
+            fileErrorMessage = error.localizedDescription
+            showFileError = true
+        }
     }
 
     private func relativeDate(_ date: Date) -> String {

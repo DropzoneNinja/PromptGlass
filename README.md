@@ -1,5 +1,7 @@
 # PromptGlass
 
+<img src="icon.png" alt="PromptGlass icon" width="128">
+
 A native macOS teleprompter application that tracks your speech in real time, highlights the word you are currently saying, and scrolls the script to keep your reading position comfortably in view.
 
 ## What it does
