@@ -20,6 +20,8 @@ struct ContentView: View {
     @State private var teleprompterVM: TeleprompterViewModel
     @State private var permissionService = PermissionService()
 
+    @Environment(\.aiViewModel) private var aiVM
+
     // MARK: - Window management
 
     @State private var windowController = TeleprompterWindowController()
@@ -44,7 +46,8 @@ struct ContentView: View {
         MainEditorView(
             editorVM:          editorVM,
             sessionVM:         sessionVM,
-            permissionService: permissionService
+            permissionService: permissionService,
+            aiVM:              aiVM
         )
         .frame(minWidth: 800, minHeight: 560)
         // Expose view models to menu-bar Commands via AppCommands.

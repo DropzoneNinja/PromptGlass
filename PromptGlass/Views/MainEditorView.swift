@@ -23,6 +23,7 @@ struct MainEditorView: View {
     var editorVM: ScriptEditorViewModel
     var sessionVM: SessionViewModel
     var permissionService: PermissionService
+    var aiVM: AIViewModel
 
     // MARK: - Local dialog state
 
@@ -34,6 +35,13 @@ struct MainEditorView: View {
     @State private var renameText = ""
     @State private var showFileError      = false
     @State private var fileErrorMessage   = ""
+
+    // MARK: - AI sheet state
+
+    @State private var showAISheet         = false
+    @State private var capturedContextText = ""
+    @State private var capturedHasSelection = false
+    @State private var capturedRange: NSRange? = nil
 
     // MARK: - Body
 
@@ -218,6 +226,18 @@ struct MainEditorView: View {
             }
             .navigationTitle(detailTitle)
             .toolbar { detailToolbar }
+            .sheet(isPresented: $showAISheet) {
+                AIPromptSheet(
+                    aiVM: aiVM,
+                    contextText: capturedContextText,
+                    hasSelection: capturedHasSelection,
+                    onApply: { replacement in
+                        applyAIResult(replacement)
+                        showAISheet = false
+                    },
+                    onCancel: { showAISheet = false }
+                )
+            }
         } else {
             emptyState
                 .toolbar { detailToolbar }
@@ -254,6 +274,19 @@ struct MainEditorView: View {
 
     @ToolbarContentBuilder
     private var detailToolbar: some ToolbarContent {
+        // AI Assistant — only when a script is selected and no session is running.
+        if editorVM.selectedDocument != nil, !sessionVM.isActive {
+            ToolbarItem {
+                Button(action: prepareAndOpenAISheet) {
+                    Label("AI Assistant", systemImage: "sparkles")
+                }
+                .help(aiVM.isConfigured
+                      ? "AI writing assistant  ⌥⌘A"
+                      : "Configure an OpenAI API key in Settings (⌘,)")
+                .keyboardShortcut("a", modifiers: [.option, .command])
+                .disabled(!aiVM.isConfigured)
+            }
+        }
         // Delete — only when a script is selected and no session is running.
         if let doc = editorVM.selectedDocument, !sessionVM.isActive {
             ToolbarItem {
@@ -346,6 +379,49 @@ struct MainEditorView: View {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .abbreviated
         return f.localizedString(for: date, relativeTo: Date())
+    }
+
+    // MARK: - AI helpers
+
+    /// Snapshot the current selection (or full document) and open the AI sheet.
+    ///
+    /// Must be called synchronously in the button action — before SwiftUI presents
+    /// the sheet — because presenting the sheet moves focus away from the NSTextView,
+    /// making `firstResponder` no longer the text editor.
+    private func prepareAndOpenAISheet() {
+        if let tv = NSApplication.shared.keyWindow?.firstResponder as? NSTextView {
+            let sel = tv.selectedRange()
+            capturedHasSelection = sel.length > 0
+            capturedRange        = sel
+            capturedContextText  = sel.length > 0
+                ? (tv.string as NSString).substring(with: sel)
+                : tv.string
+        } else {
+            capturedHasSelection = false
+            capturedRange        = nil
+            capturedContextText  = editorVM.selectedDocument?.rawText ?? ""
+        }
+        showAISheet = true
+    }
+
+    /// Insert or replace text in the document using the range captured before the sheet opened.
+    ///
+    /// We cannot rely on `firstResponder` here because the sheet is still presented
+    /// (and holding focus) when `onApply` fires.  Applying directly to `rawText` via
+    /// the view model is the correct path; the ViewModel marks the document dirty and
+    /// auto-saves as usual.
+    private func applyAIResult(_ replacement: String) {
+        guard var rawText = editorVM.selectedDocument?.rawText else { return }
+
+        if let nsRange = capturedRange,
+           let swiftRange = Range(nsRange, in: rawText) {
+            // Replace the selection, or insert at the cursor position (length == 0).
+            rawText.replaceSubrange(swiftRange, with: replacement)
+        } else {
+            // No captured range — append to end as a safe fallback.
+            rawText += replacement
+        }
+        editorVM.updateText(rawText)
     }
 }
 

@@ -34,14 +34,15 @@ targets:
         com.apple.security.app-sandbox: true
         com.apple.security.device.audio-input: true
         com.apple.security.files.user-selected.read-write: true
+        com.apple.security.network.client: true
     info:
       path: PromptGlass/Info.plist
       properties:
         CFBundleName: PromptGlass
         CFBundleDisplayName: PromptGlass
         CFBundleIdentifier: com.promptglass.PromptGlass
-        CFBundleVersion: "7"
-        CFBundleShortVersionString: "0.7"
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "1.0"
         NSPrincipalClass: NSApplication
         NSMicrophoneUsageDescription: "PromptGlass needs microphone access to follow along with your narration."
         NSSpeechRecognitionUsageDescription: "PromptGlass uses speech recognition to highlight the word you are currently speaking."

@@ -47,6 +47,12 @@ struct SessionSettings: Codable, Equatable {
     /// Created by `SessionViewModel.selectAudioSaveFolder()` via `NSOpenPanel`.
     var audioSaveFolderBookmark: Data? = nil
 
+    // MARK: AI
+
+    /// Non-sensitive AI configuration (model, base URL, system prompt, token limit).
+    /// The API key is stored separately in the Keychain via `KeychainService`.
+    var aiSettings: AISettings = .default
+
     // MARK: Defaults
 
     static let `default` = SessionSettings()

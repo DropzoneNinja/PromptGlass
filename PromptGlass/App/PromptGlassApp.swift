@@ -2,6 +2,9 @@ import SwiftUI
 
 @main
 struct PromptGlassApp: App {
+
+    @State private var aiVM = AIViewModel()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -12,5 +15,22 @@ struct PromptGlassApp: App {
         .commands {
             AppCommands()
         }
+        // Share the AI view model with the editor window tree.
+        .environment(\.aiViewModel, aiVM)
+
+        // Standard macOS Settings window (Cmd+,).
+        Settings {
+            TabView {
+                AISettingsView(aiVM: aiVM)
+                    .tabItem { Label("AI", systemImage: "sparkles") }
+            }
+            .frame(width: 480, height: 520)
+        }
+
+        // Debug window — shows raw request/response from the last AI call.
+        Window("AI Debug", id: "ai-debug") {
+            AIDebugView(aiVM: aiVM)
+        }
+        .defaultSize(width: 720, height: 640)
     }
 }

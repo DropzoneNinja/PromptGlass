@@ -17,6 +17,7 @@ Key capabilities:
 - **Audio recording** — narration is recorded to a timestamped `.m4a` file in the app's support directory for every session.
 - **Elapsed timer** — a session clock is visible during prompting.
 - **Live audio meter** — a waveform-style visualization confirms microphone input is active.
+- ** AI Assistant ** -- allows you to specify an OpenAI (local or Cloud based) model that then can be used to write or assist with script creation
 
 ## Requirements
 
