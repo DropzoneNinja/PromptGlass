@@ -47,10 +47,12 @@ enum ScriptParser {
                 if let closeRange = rawText.range(of: "]", range: afterOpen) {
                     // Balanced pair
                     let innerText = String(rawText[openRange.upperBound..<closeRange.lowerBound])
+                    let isHidden = innerText.lowercased().hasPrefix("visual:")
                     tokens.append(.direction(DirectionToken(
                         displayText: "[\(innerText)]",
                         innerText: innerText,
-                        tokenIndex: tokenIndex
+                        tokenIndex: tokenIndex,
+                        isHidden: isHidden
                     )))
                     tokenIndex += 1
                     searchRange = closeRange.upperBound..<rawText.endIndex
@@ -58,10 +60,12 @@ enum ScriptParser {
                 } else {
                     // Unbalanced `[` — swallow remainder as a direction token.
                     let innerText = String(rawText[openRange.upperBound...])
+                    let isHidden = innerText.lowercased().hasPrefix("visual:")
                     tokens.append(.direction(DirectionToken(
                         displayText: "[\(innerText)",
                         innerText: innerText,
-                        tokenIndex: tokenIndex
+                        tokenIndex: tokenIndex,
+                        isHidden: isHidden
                     )))
                     tokenIndex += 1
                     break

@@ -63,13 +63,21 @@ On first launch the app requests microphone and speech recognition access with u
 
 ## Script format
 
-Scripts are plain text. Anything inside square brackets is treated as a direction and excluded from spoken alignment:
+Scripts are plain text. Two types of bracket tags are supported:
+
+**Stage directions** — `[pause]`, `[look to camera 2]`  
+Displayed in the teleprompter in a faded italic style. Excluded from speech alignment.
+
+**Visual notes** — `[visual: cut to B-roll]`, `[visual: lower-third graphic]`  
+Notes for the video editor. Completely hidden from the teleprompter display and excluded from speech alignment. The tag must begin with `visual:` immediately after the opening bracket (case-insensitive).
+
+Example combining both:
 
 ```
-Hello and welcome. [pause] Today we are going to talk about clean energy.
+Hello and welcome. [pause] Today we are going to talk about [visual: insert product shot here] clean energy.
 ```
 
-Direction text appears in the teleprompter in a visually distinct style. It does not affect word matching.
+In the teleprompter, `[pause]` appears faded and italic; the `[visual: ...]` note is invisible.
 
 ## Known limitations
 

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
+PROJECT_YML="project.yml"
+XCODEPROJ="PromptGlass.xcodeproj"
+APP_NAME="PromptGlass"
+BUILD_DIR=".build"
+APP_PATH="${BUILD_DIR}/Build/Products/Debug/${APP_NAME}.app"
+
+# ── 1. Increment patch version in project.yml ─────────────────────────────────
+
+current_version=$(grep 'CFBundleShortVersionString:' "$PROJECT_YML" \
+    | sed 's/.*"\(.*\)".*/\1/')
+IFS='.' read -r major minor patch <<< "$current_version"
+patch=$((patch + 1))
+new_version="${major}.${minor}.${patch}"
+
+sed -i '' \
+    "s/CFBundleShortVersionString: \"${current_version}\"/CFBundleShortVersionString: \"${new_version}\"/" \
+    "$PROJECT_YML"
+
+# Also bump the build number (CFBundleVersion).
+current_build=$(grep 'CFBundleVersion:' "$PROJECT_YML" \
+    | sed 's/.*"\(.*\)".*/\1/')
+new_build=$((current_build + 1))
+sed -i '' \
+    "s/CFBundleVersion: \"${current_build}\"/CFBundleVersion: \"${new_build}\"/" \
+    "$PROJECT_YML"
+
+echo "Version  : ${current_version} → ${new_version}"
+echo "Build no.: ${current_build} → ${new_build}"
+
+# ── 2. xcodegen (when project.yml is newer than the .xcodeproj) ───────────────
+
+if [ ! -d "$XCODEPROJ" ] || [ "$PROJECT_YML" -nt "$XCODEPROJ" ]; then
+    if ! command -v xcodegen &>/dev/null; then
+        echo "error: xcodegen not found. Install with: brew install xcodegen" >&2
+        exit 1
+    fi
+    echo "Running xcodegen..."
+    xcodegen generate --quiet
+else
+    echo "xcodegen: up to date, skipping."
+fi
+
+# ── 3. Build ──────────────────────────────────────────────────────────────────
+
+mkdir -p "$BUILD_DIR"
+LOG="${BUILD_DIR}/build.log"
+echo "Building ${APP_NAME} ${new_version}..."
+
+if xcodebuild \
+        -project "$XCODEPROJ" \
+        -scheme "$APP_NAME" \
+        -configuration Debug \
+        -derivedDataPath "$BUILD_DIR" \
+        build \
+        > "$LOG" 2>&1; then
+    echo "Build succeeded → ${APP_PATH}"
+else
+    echo "Build FAILED. Last 60 lines of ${LOG}:" >&2
+    tail -60 "$LOG" >&2
+    exit 1
+fi
+
+# ── 4. Run (optional) ─────────────────────────────────────────────────────────
+
+if [ "${1:-}" = "run" ]; then
+    echo "Opening ${APP_NAME}..."
+    open "$APP_PATH"
+fi

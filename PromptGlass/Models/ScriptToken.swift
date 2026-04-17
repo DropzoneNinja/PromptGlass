@@ -46,6 +46,9 @@ struct SpokenToken: Equatable {
 
 /// A bracketed stage direction such as `[smile]` or `[look to camera 2]`.
 /// Displayed visually distinct; never included in speech alignment.
+///
+/// Tags whose `innerText` starts with `"visual:"` (case-insensitive) are video-editor
+/// notes — they set `isHidden = true` and are completely omitted from the teleprompter.
 struct DirectionToken: Equatable {
     /// Full bracketed text as written (e.g. "[smile]").
     let displayText: String
@@ -55,4 +58,8 @@ struct DirectionToken: Equatable {
 
     /// Zero-based index in the full `ScriptDocument.tokens` array.
     let tokenIndex: Int
+
+    /// When `true`, this token is not rendered on the teleprompter at all.
+    /// Set for `[visual: ...]` tags, which are notes for the video editor.
+    let isHidden: Bool
 }

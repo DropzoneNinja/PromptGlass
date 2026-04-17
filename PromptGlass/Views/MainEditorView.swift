@@ -170,6 +170,7 @@ struct MainEditorView: View {
                         Button("Delete", role: .destructive) { beginDelete(doc) }
                     }
             }
+            .onMove { from, to in editorVM.moveDocuments(from: from, to: to) }
         }
         .navigationTitle("Scripts")
         .toolbar {

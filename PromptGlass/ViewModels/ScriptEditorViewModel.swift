@@ -128,6 +128,13 @@ final class ScriptEditorViewModel {
         trySave()
     }
 
+    /// Move documents from the given offsets to the given destination, preserving
+    /// the user-defined order.  Called by the sidebar's drag-to-reorder gesture.
+    func moveDocuments(from source: IndexSet, to destination: Int) {
+        documents.move(fromOffsets: source, toOffset: destination)
+        trySave()
+    }
+
     /// Delete the given document.
     ///
     /// If it was selected, the selection moves to the next available document.
@@ -209,10 +216,8 @@ final class ScriptEditorViewModel {
         }
     }
 
-    /// Sorts `documents` by most-recently-modified, persists to disk, and
-    /// records any error in `saveError`.
+    /// Persists the current document list to disk and records any error in `saveError`.
     private func trySave() {
-        documents.sort { $0.modifiedAt > $1.modifiedAt }
         do {
             try persistence.saveDocuments(documents)
             saveError = nil

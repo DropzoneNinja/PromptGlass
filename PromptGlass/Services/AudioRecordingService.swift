@@ -263,20 +263,33 @@ final class AudioRecordingService {
     // MARK: - Helpers
 
     private func makeFileURL(in directory: URL, scriptName: String) -> URL {
-        let sanitised = scriptName
-            .components(separatedBy: CharacterSet.alphanumerics.union(.init(charactersIn: " -_")).inverted)
-            .joined()
-            .trimmingCharacters(in: .whitespaces)
-            .prefix(40)
+        let sanitised = String(
+            scriptName
+                .components(separatedBy: CharacterSet.alphanumerics.union(.init(charactersIn: " -_")).inverted)
+                .joined()
+                .trimmingCharacters(in: .whitespaces)
+                .prefix(40)
+        )
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let timestamp = formatter.string(from: Date())
 
-        let filename = sanitised.isEmpty
-            ? "\(timestamp).m4a"
-            : "\(timestamp)_\(sanitised).m4a"
+        guard !sanitised.isEmpty else {
+            return directory.appendingPathComponent("\(timestamp).m4a")
+        }
 
-        return directory.appendingPathComponent(filename)
+        let existing = (try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil
+        )) ?? []
+        let existingCount = existing.filter { url in
+            let name = url.lastPathComponent
+            return name.hasSuffix("_\(sanitised).m4a") ||
+                   name.contains("_\(sanitised)-take-")
+        }.count
+        let takeNumber = existingCount + 1
+
+        return directory.appendingPathComponent("\(timestamp)_\(sanitised)-take-\(takeNumber).m4a")
     }
 }

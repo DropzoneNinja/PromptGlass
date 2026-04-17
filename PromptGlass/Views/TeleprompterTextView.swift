@@ -205,9 +205,13 @@ struct TeleprompterTextView: NSViewRepresentable {
         var tokenRanges: [(token: ScriptToken, range: NSRange)] = []
         let paraStyle = makeParagraphStyle()
 
-        for (index, token) in tokens.enumerated() {
-            // Space separator between tokens (invisible, uses body font size).
-            if index > 0 {
+        var firstRendered = true
+        for token in tokens {
+            // [visual: ...] tags are video-editor notes — completely omitted from the teleprompter.
+            if case .direction(let dt) = token, dt.isHidden { continue }
+
+            // Space separator between rendered tokens (invisible, uses body font size).
+            if !firstRendered {
                 let spaceAttrs: [NSAttributedString.Key: Any] = [
                     .font:            NSFont.systemFont(ofSize: fontSize),
                     .foregroundColor: NSColor.clear,
@@ -215,6 +219,7 @@ struct TeleprompterTextView: NSViewRepresentable {
                 ]
                 result.append(NSAttributedString(string: " ", attributes: spaceAttrs))
             }
+            firstRendered = false
 
             let display = token.displayText
             let start   = result.length

@@ -208,4 +208,43 @@ struct ScriptParserTests {
         #expect(doc.tokens.count == 3)
         #expect(doc.spokenTokens.count == 2)
     }
+
+    // MARK: Visual tags
+
+    @Test func visualTagIsHidden() {
+        let tokens = ScriptParser.parse("[visual: cut to B-roll]")
+        let dirs = directions(tokens)
+        #expect(dirs.count == 1)
+        #expect(dirs[0].isHidden == true)
+        #expect(dirs[0].innerText == "visual: cut to B-roll")
+    }
+
+    @Test func regularDirectionIsNotHidden() {
+        let tokens = ScriptParser.parse("[pause]")
+        let dirs = directions(tokens)
+        #expect(dirs.count == 1)
+        #expect(dirs[0].isHidden == false)
+    }
+
+    @Test func visualTagCaseInsensitive() {
+        let tokens = ScriptParser.parse("[VISUAL: lower-third graphic]")
+        let dirs = directions(tokens)
+        #expect(dirs[0].isHidden == true)
+    }
+
+    @Test func visualTagDoesNotAffectSpokenIndices() {
+        // Spoken tokens around a visual tag must retain contiguous spokenIndex values.
+        let tokens = ScriptParser.parse("one [visual: b-roll] two three")
+        let words = spoken(tokens)
+        #expect(words.count == 3)
+        #expect(words.map(\.spokenIndex) == [0, 1, 2])
+    }
+
+    @Test func visualColonRequiredToMatch() {
+        // "[visualize this]" must NOT be treated as a hidden visual tag.
+        let tokens = ScriptParser.parse("[visualize this]")
+        let dirs = directions(tokens)
+        #expect(dirs.count == 1)
+        #expect(dirs[0].isHidden == false)
+    }
 }
