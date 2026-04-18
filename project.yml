@@ -41,8 +41,8 @@ targets:
         CFBundleName: PromptGlass
         CFBundleDisplayName: PromptGlass
         CFBundleIdentifier: com.promptglass.PromptGlass
-        CFBundleVersion: "2"
-        CFBundleShortVersionString: "1.0.1"
+        CFBundleVersion: "5"
+        CFBundleShortVersionString: "1.2.3"
         NSPrincipalClass: NSApplication
         NSMicrophoneUsageDescription: "PromptGlass needs microphone access to follow along with your narration."
         NSSpeechRecognitionUsageDescription: "PromptGlass uses speech recognition to highlight the word you are currently speaking."

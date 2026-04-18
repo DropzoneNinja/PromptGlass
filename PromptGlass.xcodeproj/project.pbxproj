@@ -27,6 +27,7 @@
 		650780190222AA3081CBBF79 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131D2719AC7FD887D0AE1249 /* TimerView.swift */; };
 		7BDB472C0408C59752812628 /* ScriptEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80530208F1660C0BCCBDD73 /* ScriptEditorViewModel.swift */; };
 		7DCDF63A5B6FD1C8169E94FE /* ScrollCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E8BB01F658B55BDA8645B05 /* ScrollCoordinatorTests.swift */; };
+		7E3D31C4D5DA5370414EC534 /* SpellCheckTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB299E87A058D025E39F949 /* SpellCheckTextEditor.swift */; };
 		7F61D81F03B732B55CB85875 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B800426000AD242BEF6A22 /* OpenAIService.swift */; };
 		8A487DF03D37C346482F23AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F74ABBBF90FCDECBBEF13C /* ContentView.swift */; };
 		8A725CD0081A2487F44DE869 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEA50BAE0B9D98BFFA13BDE /* KeychainService.swift */; };
@@ -103,6 +104,7 @@
 		AEF39DEFE1FBFB599E2537B7 /* SessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViewModel.swift; sourceTree = "<group>"; };
 		B1E1CD05666CE650AF436025 /* SessionControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlsView.swift; sourceTree = "<group>"; };
 		C24EB12FC172BAAB6EE00999 /* PromptSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSession.swift; sourceTree = "<group>"; };
+		CEB299E87A058D025E39F949 /* SpellCheckTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpellCheckTextEditor.swift; sourceTree = "<group>"; };
 		CFDDA9B0F7E653E3D9397F9C /* TeleprompterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeleprompterView.swift; sourceTree = "<group>"; };
 		D4A24A75DDF4E36D439F307B /* PromptGlass.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PromptGlass.entitlements; sourceTree = "<group>"; };
 		DA732DB4CADF1BD39E3D7ABF /* MainEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainEditorView.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 				DA732DB4CADF1BD39E3D7ABF /* MainEditorView.swift */,
 				F7694D27D3838D2635D285A6 /* ScriptEditorView.swift */,
 				B1E1CD05666CE650AF436025 /* SessionControlsView.swift */,
+				CEB299E87A058D025E39F949 /* SpellCheckTextEditor.swift */,
 				91ED72B8735E82E1358B9CC4 /* TeleprompterTextView.swift */,
 				CFDDA9B0F7E653E3D9397F9C /* TeleprompterView.swift */,
 				131D2719AC7FD887D0AE1249 /* TimerView.swift */,
@@ -385,6 +388,7 @@
 				356F9A36D586D0B420A71DE2 /* SpeechAlignmentEngine.swift in Sources */,
 				B987542D5854EE3576E983B6 /* SpeechRecognitionService.swift in Sources */,
 				57284FC31A789FAF4AF72FC1 /* SpeechRecognizing.swift in Sources */,
+				7E3D31C4D5DA5370414EC534 /* SpellCheckTextEditor.swift in Sources */,
 				ACFB21A6E643FB6909F38AD9 /* TeleprompterTextView.swift in Sources */,
 				2A4E8586C1CB898CAD380CDB /* TeleprompterView.swift in Sources */,
 				DBFF334935769462FEFA3DD1 /* TeleprompterViewModel.swift in Sources */,

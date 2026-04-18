@@ -20,14 +20,7 @@ struct ScriptEditorView: View {
     // MARK: - Text editor
 
     private var textEditorArea: some View {
-        TextEditor(text: rawTextBinding)
-            .font(.system(size: 15, design: .monospaced))
-            .lineSpacing(5)
-            // Remove the default inset so we can control padding uniformly.
-            .scrollContentBackground(.hidden)
-            .padding(.horizontal, 28)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+        SpellCheckTextEditor(text: rawTextBinding)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 

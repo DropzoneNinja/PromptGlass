@@ -66,9 +66,12 @@ else
     exit 1
 fi
 
-# ── 4. Run (optional) ─────────────────────────────────────────────────────────
+# ── 4. Run / Open in Finder (optional) ───────────────────────────────────────
 
 if [ "${1:-}" = "run" ]; then
     echo "Opening ${APP_NAME}..."
     open "$APP_PATH"
+elif [ "${1:-}" = "open" ]; then
+    echo "Revealing ${APP_NAME} in Finder..."
+    open -R "$APP_PATH"
 fi
